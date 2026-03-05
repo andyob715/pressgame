@@ -2836,9 +2836,17 @@ document.getElementById("wordInput").addEventListener("input",function(){
     else{
       const avail=[...G.priv,...G.comm.slice(0,G.revealedCount)];
       if(!canForm(word,avail)){hint.textContent="Can't form from available tiles";this.classList.remove("valid");}
-      else{hint.textContent="";this.classList.add("valid");}
+      else{
+        hint.textContent="";this.classList.add("valid");
+        // Re-enable Lock if player has a locked word already — they can upgrade it
+        if(G.lockedWord) document.getElementById("btnLock").disabled=false;
+      }
     }
-  } else{hint.textContent="";this.classList.remove("valid");}
+  } else{
+    hint.textContent="";this.classList.remove("valid");
+    // Disable Lock again if input is cleared after having locked
+    if(G.lockedWord) document.getElementById("btnLock").disabled=true;
+  }
 });
 document.getElementById("wordInput").addEventListener("keydown",function(e){
   if(e.key==="Enter"&&G.priv){

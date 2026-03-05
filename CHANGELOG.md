@@ -4,6 +4,13 @@ All notable changes to pressgame.live are documented here.
 
 ---
 
+## v1.3 — 2026-03-05
+
+### Fixed
+- **Lock re-enables after first use** when a new valid word is typed — previously Lock stayed permanently disabled after locking, preventing players from upgrading to a better word at a later stage. Lock now re-enables dynamically whenever a valid word is in the input field, and disables again if the input is cleared
+
+---
+
 ## v1.2 — 2026-03-05
 
 ### Fixed
