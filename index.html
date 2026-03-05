@@ -2525,11 +2525,14 @@ function hasValidWord(tiles){
 function dealTiles(){
   for(let attempt=0;attempt<300;attempt++){
     const d=shuffle(DECK),tiles=d.slice(0,8);
-    if(tiles.filter(t=>VOWELS.has(t)).length>=2&&hasValidWord(tiles))
+    const first6=tiles.slice(0,6);
+    const hasVowelInFirst6=first6.some(t=>VOWELS.has(t));
+    const totalVowels=tiles.filter(t=>VOWELS.has(t)).length;
+    if(hasVowelInFirst6&&totalVowels>=2&&hasValidWord(tiles))
       return{priv:tiles.slice(0,3),comm:tiles.slice(3)};
   }
   // guaranteed fallback
-  const d=shuffle(DECK);d[3]="E";d[4]="A";
+  const d=shuffle(DECK);d[0]="E";d[3]="A";
   return{priv:d.slice(0,3),comm:d.slice(3,8)};
 }
 function scoreWord(word,priv){
@@ -2778,7 +2781,7 @@ function runAIAndResolve(){
 }
 
 function resolveRound(){
-  const allTiles=[...G.priv,...G.comm];
+  const allTiles=[...G.priv,...G.comm.slice(0,G.revealedCount)];
   const best=findBestWord(allTiles,G.priv);
   const bestScore=best?scoreWord(best,G.priv):null;
   const ps=G.playerScore?.total||0,as=G.aiScore?.total||0;
