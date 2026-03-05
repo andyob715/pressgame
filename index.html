@@ -2695,6 +2695,7 @@ function startRound(){
   document.getElementById("lockPressRow").style.display="grid";
   document.getElementById("submitRow").style.display="none";
   document.getElementById("btnPress").disabled=false;
+  document.getElementById("btnLock").disabled=false;
   setAI("ready");renderTiles();renderStage();
   startTimer(TIMER_LIMITS.flop);
   document.getElementById("wordInput").focus();
@@ -2711,7 +2712,15 @@ function handleLock(auto=false){
   document.getElementById("lockedScoreDisplay").textContent=s.total+"pts";
   document.getElementById("wordInput").value="";
   document.getElementById("inputHint").textContent="";
-  runAIAndResolve();
+
+  // At river — round is done, resolve now
+  // Otherwise — stay in game, player can still press for more letters
+  if(G.stage==="river"){
+    runAIAndResolve();
+  } else {
+    document.getElementById("btnLock").disabled=true;
+    startTimer(TIMER_LIMITS[G.stage]);
+  }
 }
 
 function handlePress(){
