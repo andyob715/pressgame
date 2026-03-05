@@ -4,6 +4,15 @@ All notable changes to pressgame.live are documented here.
 
 ---
 
+## v1.2 — 2026-03-05
+
+### Fixed
+- **Lock no longer immediately resolves the round** — previously hitting Lock ended the round instantly, making Press after Lock impossible. Lock now banks your word and keeps you in the game. Press remains active. Round only resolves at Submit, auto-lock, or Lock at the river
+- **Lock button disables after use** — once you've locked a word you can't re-lock, only press forward or wait for the river
+- **Penalty warning now stays visible** for the full remainder of the round after pressing with a locked word
+
+---
+
 ## v1.1 — 2026-03-05
 
 ### Fixed
