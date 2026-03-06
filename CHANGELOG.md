@@ -4,6 +4,22 @@ All notable changes to pressgame.live are documented here.
 
 ---
 
+## v1.6 — 2026-03-05
+
+### Fixed
+- **Stage track redesigned** — FLOP / TURN / RIVER labels are now fixed anchors, always visible, with pips running between them. Active stage highlights in green, others dim. Eliminates the stale/duplicate label bug entirely
+- **Locked state hint added** — after locking without pressing, a subtle prompt now appears: "Type a better word to re-lock, or Press to the river." Eliminates the dead-end feeling of a stopped timer with no guidance
+
+---
+
+## v1.5 — 2026-03-05
+
+### Fixed
+- **Timer stops on Lock** — previously the timer restarted after locking, leaving the player in a pointless countdown with nothing to do. Timer now stops on Lock and only restarts if the player chooses to Press
+- **Auto-lock respects existing locked word** — previously if the timer expired after a Lock with an empty input field, the player scored zero. Now if a locked word exists and the input is empty at expiry, the locked word is used as the final score
+
+---
+
 ## v1.4 — 2026-03-05
 
 ### Fixed

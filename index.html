@@ -387,12 +387,11 @@
   <div id="gameScreen" style="display:none;">
 
     <div class="stage-track">
+      <div class="stage-label" id="labelFlop">FLOP</div>
       <div class="stage-pip" id="pip0"></div>
-      <div class="stage-label" id="stageLabel">FLOP</div>
+      <div class="stage-label" id="labelTurn">TURN</div>
       <div class="stage-pip" id="pip1"></div>
-      <div class="stage-label" id="pip1label" style="display:none">TURN</div>
-      <div class="stage-pip" id="pip2"></div>
-      <div class="stage-label" id="pip2label" style="display:none">RIVER</div>
+      <div class="stage-label" id="labelRiver">RIVER</div>
     </div>
 
     <!-- Community on top (the table) -->
@@ -425,6 +424,9 @@
 
     <div class="penalty-notice" id="penaltyNotice">
       ⚠ You pressed — beat your locked word length or lose 3pts
+    </div>
+    <div id="lockedHint" style="display:none;font-size:11px;color:var(--muted);margin-bottom:16px;line-height:1.6;">
+      Type a better word to re-lock, or Press to the river.
     </div>
 
     <div class="input-wrap">
@@ -2599,6 +2601,7 @@ function startTimer(seconds){
 function stopTimer(){clearInterval(timerInterval);}
 function autoLock(){
   const word=document.getElementById("wordInput").value.trim().toLowerCase();
+  // Valid word in input — use it
   if(word.length>=5&&DICT.has(word)){
     const avail=[...G.priv,...G.comm.slice(0,G.revealedCount)];
     if(canForm(word,avail)){
@@ -2606,6 +2609,14 @@ function autoLock(){
       return;
     }
   }
+  // No valid word typed — but if player already locked one, use that
+  if(G.lockedWord){
+    G.playerWord=G.lockedWord;
+    G.playerScore=G.lockedScore;
+    runAIAndResolve();
+    return;
+  }
+  // Truly nothing — zero points
   G.playerWord=null;
   G.playerScore={total:0,breakdown:"time expired — no valid word"};
   runAIAndResolve();
@@ -2636,18 +2647,14 @@ function renderTiles(){
   G.justRevealed=false;
 }
 function renderStage(){
-  const labels=["FLOP","TURN","RIVER"],idx=STAGES.indexOf(G.stage);
-  // Always reset all label text first
-  document.getElementById("stageLabel").textContent=labels[0];
-  document.getElementById("pip1label").textContent=labels[1];
-  document.getElementById("pip2label").textContent=labels[2];
-  // Then set the active label
-  document.getElementById("stageLabel").textContent=labels[idx];
-  ["pip0","pip1","pip2"].forEach((id,i)=>{
-    document.getElementById(id).className="stage-pip"+(i<idx?" done":i===idx?" active":"");
+  const idx=STAGES.indexOf(G.stage);
+  // Highlight active stage label, dim others
+  ["labelFlop","labelTurn","labelRiver"].forEach((id,i)=>{
+    document.getElementById(id).style.color=i===idx?"var(--accent)":"var(--muted)";
   });
-  document.getElementById("pip1label").style.display=idx>=1?"":"none";
-  document.getElementById("pip2label").style.display=idx>=2?"":"none";
+  // pip0 = between flop and turn, pip1 = between turn and river
+  document.getElementById("pip0").className="stage-pip"+(idx>0?" done":idx===0?" active":"");
+  document.getElementById("pip1").className="stage-pip"+(idx>1?" done":idx===1?" active":"");
 }
 function setAI(state){
   const dot=document.getElementById("aiDot"),txt=document.getElementById("aiStatusText");
@@ -2701,6 +2708,7 @@ function startRound(){
   document.getElementById("submitRow").style.display="none";
   document.getElementById("btnPress").disabled=false;
   document.getElementById("btnLock").disabled=false;
+  document.getElementById("lockedHint").style.display="none";
   setAI("ready");renderTiles();renderStage();
   startTimer(TIMER_LIMITS.flop);
   document.getElementById("wordInput").focus();
@@ -2720,11 +2728,13 @@ function handleLock(auto=false){
 
   // At river — round is done, resolve now
   // Otherwise — stay in game, player can still press for more letters
+  // Timer stops on lock — only restarts if player chooses to Press
   if(G.stage==="river"){
     runAIAndResolve();
   } else {
     document.getElementById("btnLock").disabled=true;
-    startTimer(TIMER_LIMITS[G.stage]);
+    document.getElementById("lockedHint").style.display="block";
+    stopTimer();
   }
 }
 
