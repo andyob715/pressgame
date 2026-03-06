@@ -2637,6 +2637,11 @@ function renderTiles(){
 }
 function renderStage(){
   const labels=["FLOP","TURN","RIVER"],idx=STAGES.indexOf(G.stage);
+  // Always reset all label text first
+  document.getElementById("stageLabel").textContent=labels[0];
+  document.getElementById("pip1label").textContent=labels[1];
+  document.getElementById("pip2label").textContent=labels[2];
+  // Then set the active label
   document.getElementById("stageLabel").textContent=labels[idx];
   ["pip0","pip1","pip2"].forEach((id,i)=>{
     document.getElementById(id).className="stage-pip"+(i<idx?" done":i===idx?" active":"");

@@ -4,6 +4,13 @@ All notable changes to pressgame.live are documented here.
 
 ---
 
+## v1.4 — 2026-03-05
+
+### Fixed
+- **Stage labels reset correctly between rounds** — TURN and RIVER labels were persisting from the previous round, causing the stage track to show incorrect labels (e.g. RIVER / TURN / RIVER) at the start of a new round. All labels now reset to FLOP / TURN / RIVER on every renderStage call
+
+---
+
 ## v1.3 — 2026-03-05
 
 ### Fixed
