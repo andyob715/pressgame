@@ -2567,7 +2567,7 @@ const DECK   = [
 ];
 const TIMER_LIMITS  = {flop:60,turn:45,river:30};
 const PRESS_PENALTY = 3;
-const BASE_SCORES   = {5:5,6:9,7:15};
+const BASE_SCORES   = {4:5,5:5,6:9,7:15};
 const STAGES        = ["flop","turn","river"];
 const LOCK_BONUS    = {flop:2,turn:1,river:0};
 let G = {};
@@ -2609,14 +2609,17 @@ function dealTiles(){
 }
 function scoreWord(word,priv){
   const upper=word.toUpperCase();
-  const len=upper.replace("QU","Q").length;
-  const base=BASE_SCORES[Math.min(len,7)]||15;
+  // Normalize QU → single char to count tiles correctly
+  const norm=upper.split("QU").join("Ω");
+  const tileCount=norm.length; // QU=1 tile, others=1 tile each
+  // Score by tile count (5-tile = 5pts, 6-tile = 9pts, 7-tile = 15pts)
+  const base=BASE_SCORES[Math.min(tileCount,7)]||(tileCount>=7?15:5);
   const privUsed=priv.every(p=>p==="QU"?upper.includes("QU"):upper.includes(p));
   const hasRare=[...RARE].some(r=>upper.includes(r));
-  const norm=upper.split("QU").join("Ω");
   const allUniq=new Set(norm).size===norm.length;
   const bp=privUsed?2:0,br=hasRare?2:0,bu=allUniq?2:0;
-  const parts=[`${len}-letter: ${base}pts`];
+  const dispLen=tileCount; // display tile count in breakdown
+  const parts=[`${dispLen}-letter: ${base}pts`];
   if(bp)parts.push("+2 all privates");
   if(br)parts.push("+2 rare letter");
   if(bu)parts.push("+2 all unique");
@@ -2678,7 +2681,7 @@ function aiMoveStrategic(priv,comm,stagesLeft){
   // If bonus+current score beats what we'd likely gain, lock
   if(stagesLeft>0&&bonus>0&&(satisfied||(bonusedScore>=10))){
     const stg=stagesLeft===2?"flop":"turn";
-    return{action:"lock",word:pick.w,score:{...pick.s,total:pick.s.total+bonus},lockStage:stg};
+    return{action:"lock",word:pick.w,score:pick.s,lockStage:stg};
   }
   if(!satisfied&&stagesLeft>0)return{action:"press",word:pick.w,score:pick.s,lockStage:null};
   const stg=stagesLeft===0?"river":stagesLeft===2?"flop":"turn";
