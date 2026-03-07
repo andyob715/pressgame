@@ -67,6 +67,26 @@
   }
   .btn-howto:hover { border-color: var(--muted); color: var(--text); }
 
+  /* ── WHAT'S NEW BANNER ── */
+  .whats-new {
+    background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.2);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; text-align: left;
+    position: relative;
+  }
+  .whats-new-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .whats-new-label { font-size: 10px; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; }
+  .whats-new-version { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; }
+  .whats-new-close { background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 0 2px; line-height: 1; }
+  .whats-new-close:hover { color: var(--text); }
+  .whats-new ul { list-style: none; padding: 0; margin: 0; }
+  .whats-new ul li { font-size: 11px; color: var(--muted); line-height: 1.7; padding-left: 14px; position: relative; }
+  .whats-new ul li::before { content: '→'; position: absolute; left: 0; color: var(--accent); }
+  .whats-new ul li strong { color: var(--text); }
+
+  /* ── WORD SAVED NOTICE ── */
+  .word-saved { font-size: 11px; color: var(--accent2); margin-bottom: 12px; min-height: 16px; letter-spacing: 0.04em; opacity: 0; transition: opacity 0.2s; }
+  .word-saved.show { opacity: 1; }
+
   /* ── MODAL ── */
   .modal-overlay {
     display: none; position: fixed; inset: 0;
@@ -238,6 +258,30 @@
   .btn-rematch:hover { background: var(--accent2); }
   .btn-home { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); border-radius: 10px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: all 0.15s; }
   .btn-home:hover { border-color: var(--muted); color: var(--text); }
+
+  /* ── RESULT COMMUNITY TILES ── */
+  .result-community { margin-bottom: 20px; }
+  .result-community-label { font-size: 10px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; }
+  .result-tiles-row { display: flex; gap: 7px; flex-wrap: wrap; }
+  .result-tile {
+    width: 44px; height: 50px; border-radius: 7px; border: 1px solid var(--border);
+    background: var(--surface); display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600; color: var(--text);
+  }
+  .result-tile.private { border-color: var(--private); color: var(--private); }
+  .result-tile.rare    { border-color: var(--rare); color: var(--rare); }
+  .result-tile.unused  { opacity: 0.35; }
+  .result-tiles-divider { width: 1px; height: 50px; background: var(--border); margin: 0 2px; }
+
+  /* ── STAGE BADGE on result cards ── */
+  .result-stage-badge {
+    display: inline-block; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); background: var(--bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 2px 6px; margin-bottom: 8px;
+  }
+  .result-stage-badge.flop  { color: var(--accent);  border-color: rgba(74,222,128,0.3); }
+  .result-stage-badge.turn  { color: var(--warn);     border-color: rgba(245,158,11,0.3); }
+  .result-stage-badge.river { color: var(--muted);    border-color: var(--border); }
 </style>
 </head>
 <body>
@@ -254,6 +298,21 @@
        HOME SCREEN
   ══════════════════════════════ -->
   <div id="homeScreen" class="home-screen">
+
+    <!-- What's New Banner — dismissable, shown once per version -->
+    <div class="whats-new" id="whatsNewBanner">
+      <div class="whats-new-header">
+        <span class="whats-new-label">What's new</span>
+        <span class="whats-new-version">v2.1</span>
+        <button class="whats-new-close" onclick="dismissWhatsNew()">✕</button>
+      </div>
+      <ul>
+        <li><strong>Lock now ends your round</strong> — take your bonus and stand pat. No more limbo.</li>
+        <li><strong>Pressing with a word typed</strong> keeps it as your safety net — you'll see it confirmed.</li>
+        <li><strong>Penalty simplified</strong> — only applies if you press and don't improve your word length.</li>
+      </ul>
+    </div>
+
     <p class="home-tagline">
       Build the best word from your hand.<br>
       Lock it in safely — or press your luck.<br>
@@ -332,8 +391,8 @@
           <div class="db db-press">Press →</div>
         </div>
 
-        <div class="tip accent"><strong>Lock</strong> — bank your current word. Round ends safely. Score is yours.</div>
-        <div class="tip warn"><strong>Press</strong> — reveal the next letter and hunt for something longer. But if you can't beat your previous word length at the end, <strong>you lose 3pts</strong>.</div>
+        <div class="tip accent"><strong>Lock</strong> — bank your word, take your bonus, and you're done. Round resolves once the AI plays out. Lock early for a bonus: <strong style="color:var(--warn)">+2 at Flop, +1 at Turn</strong>.</div>
+        <div class="tip warn"><strong>Press</strong> — reveal the next letter and hunt for something longer. If you have a word typed, it's saved as your safety net. But if you end up with a shorter word than you started with, <strong>you lose 3pts</strong>.</div>
 
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:4px;">
           <p style="font-size:11px;color:var(--muted);line-height:1.7;">
@@ -363,10 +422,12 @@
           <div class="bonus-row"><span class="bpts">+2</span><span class="bdesc">Use all 3 of your private letters</span></div>
           <div class="bonus-row"><span class="bpts">+2</span><span class="bdesc">Word contains a rare letter (J, K, X, Z, QU)</span></div>
           <div class="bonus-row"><span class="bpts">+2</span><span class="bdesc">Every letter in the word is unique</span></div>
+          <div class="bonus-row" style="border-top:1px solid var(--border);margin-top:6px;padding-top:10px;"><span class="bpts" style="color:var(--warn)">+2</span><span class="bdesc" style="color:var(--warn)">Lock at Flop (early lock bonus)</span></div>
+          <div class="bonus-row"><span class="bpts" style="color:var(--warn)">+1</span><span class="bdesc" style="color:var(--warn)">Lock at Turn (early lock bonus)</span></div>
         </div>
 
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:4px;text-align:center;">
-          <p style="font-size:11px;color:var(--muted);">Max possible: <strong style="color:var(--accent);font-size:14px;">21 pts</strong> — 7 letters + all 3 bonuses</p>
+          <p style="font-size:11px;color:var(--muted);">Max possible: <strong style="color:var(--accent);font-size:14px;">23 pts</strong> — 7 letters + all 3 bonuses + lock at Flop</p>
         </div>
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center;margin-bottom:0;">
           <p style="font-size:11px;color:var(--muted);">After every round, the <strong style="color:var(--warn)">best possible word</strong> from all 8 letters is revealed.</p>
@@ -423,11 +484,10 @@
     </div>
 
     <div class="penalty-notice" id="penaltyNotice">
-      ⚠ You pressed — beat your locked word length or lose 3pts
+      ⚠ You pressed — beat your word length or lose 3pts
     </div>
-    <div id="lockedHint" style="display:none;font-size:11px;color:var(--muted);margin-bottom:16px;line-height:1.6;">
-      Type a better word to re-lock, or Press to the river.
-    </div>
+
+    <div class="word-saved" id="wordSaved"></div>
 
     <div class="input-wrap">
       <input type="text" class="word-input" id="wordInput"
@@ -436,7 +496,7 @@
     </div>
 
     <div class="btn-row" id="lockPressRow">
-      <button class="btn btn-lock" id="btnLock" onclick="handleLock()">Lock ✓</button>
+      <button class="btn btn-lock" id="btnLock" onclick="handleLock()">Lock ✓ <span id="lockBonusHint" style="font-size:10px;opacity:0.8;"></span></button>
       <button class="btn btn-press" id="btnPress" onclick="handlePress()">Press →</button>
     </div>
     <div id="submitRow" style="display:none">
@@ -453,14 +513,23 @@
   <div class="result-screen" id="resultScreen">
     <div class="result-header">Round Result</div>
     <div class="round-verdict" id="roundVerdict"></div>
+
+    <!-- All 5 community tiles always shown -->
+    <div class="result-community">
+      <div class="result-community-label">Community tiles</div>
+      <div class="result-tiles-row" id="resultCommunityTiles"></div>
+    </div>
+
     <div class="result-cards">
       <div class="result-card" id="playerCard">
+        <div class="result-stage-badge" id="playerStageBadge"></div>
         <div class="result-card-label">You</div>
         <div class="result-word"  id="playerResultWord">—</div>
         <div class="result-score" id="playerResultScore">0</div>
         <div class="result-breakdown" id="playerResultBreakdown"></div>
       </div>
       <div class="result-card" id="aiCard">
+        <div class="result-stage-badge" id="aiStageBadge"></div>
         <div class="result-card-label">Strategic</div>
         <div class="result-word"  id="aiResultWord">—</div>
         <div class="result-score" id="aiResultScore">0</div>
@@ -2500,6 +2569,7 @@ const TIMER_LIMITS  = {flop:60,turn:45,river:30};
 const PRESS_PENALTY = 3;
 const BASE_SCORES   = {5:5,6:9,7:15};
 const STAGES        = ["flop","turn","river"];
+const LOCK_BONUS    = {flop:2,turn:1,river:0};
 let G = {};
 
 // ─────────────────────────────────────────────
@@ -2562,20 +2632,77 @@ function findBestWord(tiles,priv){
 }
 
 // ─────────────────────────────────────────────
-// AI
+// AI — THREE TIERS
 // ─────────────────────────────────────────────
-function aiMove(priv,comm,stagesLeft){
+function getBestCandidates(priv,comm){
   const tiles=[...priv,...comm],cands=[];
   for(const w of DICT){
     if(w.length<5||w.length>7)continue;
     if(canForm(w,tiles))cands.push({w,s:scoreWord(w,priv)});
   }
   cands.sort((a,b)=>b.s.total-a.s.total);
-  if(!cands.length)return{action:stagesLeft>0?"press":"submit",word:null};
+  return cands;
+}
+
+// CASUAL — locks early, actively chases the bonus
+function aiMoveCasual(priv,comm,stagesLeft){
+  const cands=getBestCandidates(priv,comm);
+  if(!cands.length)return{action:stagesLeft>0?"press":"submit",word:null,lockStage:null};
+  // Casual locks at Flop if they have anything at all (loves the +2)
+  // At Turn, locks if they have a 5+ letter word (loves the +1)
+  // Very reluctant to press — only does so if no valid word yet
+  if(stagesLeft===2){ // at flop
+    // Always lock at flop if there's any valid word
+    const pick=cands[Math.min(Math.floor(Math.random()*3),cands.length-1)];
+    return{action:"lock",word:pick.w,score:pick.s,lockStage:"flop"};
+  }
+  if(stagesLeft===1){ // at turn
+    const pick=cands[Math.min(Math.floor(Math.random()*3),cands.length-1)];
+    return{action:"lock",word:pick.w,score:pick.s,lockStage:"turn"};
+  }
+  // River — submit
+  const pick=cands[Math.min(Math.floor(Math.random()*3),cands.length-1)];
+  return{action:"submit",word:pick.w,score:pick.s,lockStage:"river"};
+}
+
+// STRATEGIC — calculates expected value, weighs bonus vs. potential gain
+function aiMoveStrategic(priv,comm,stagesLeft){
+  const cands=getBestCandidates(priv,comm);
+  if(!cands.length)return{action:stagesLeft>0?"press":"submit",word:null,lockStage:null};
   const pick=cands[Math.min(Math.floor(Math.random()*5),cands.length-1)];
+  // Satisfied = has 6+ letter word or uses a private letter — good enough
   const satisfied=pick.w.length>=6||priv.some(p=>pick.w.toUpperCase().includes(p));
-  if(!satisfied&&stagesLeft>0)return{action:"press",word:pick.w,score:pick.s};
-  return{action:stagesLeft===0?"submit":"lock",word:pick.w,score:pick.s};
+  // Bonus awareness: if at flop with +2 available and a decent word, consider locking
+  const bonus=LOCK_BONUS[stagesLeft===2?"flop":stagesLeft===1?"turn":"river"]||0;
+  const bonusedScore=(pick.s.total||0)+bonus;
+  // If bonus+current score beats what we'd likely gain, lock
+  if(stagesLeft>0&&bonus>0&&(satisfied||(bonusedScore>=10))){
+    const stg=stagesLeft===2?"flop":"turn";
+    return{action:"lock",word:pick.w,score:{...pick.s,total:pick.s.total+bonus},lockStage:stg};
+  }
+  if(!satisfied&&stagesLeft>0)return{action:"press",word:pick.w,score:pick.s,lockStage:null};
+  const stg=stagesLeft===0?"river":stagesLeft===2?"flop":"turn";
+  return{action:stagesLeft===0?"submit":"lock",word:pick.w,score:pick.s,lockStage:stg};
+}
+
+// MASTERMIND — ignores bonus entirely, always hunts max score
+function aiMoveMastermind(priv,comm,stagesLeft){
+  const cands=getBestCandidates(priv,comm);
+  if(!cands.length)return{action:stagesLeft>0?"press":"submit",word:null,lockStage:null};
+  const top=cands[0];
+  // Only locks/submits if has max-scoring word (7 letters or top possible)
+  const hasMax=top.w.length===7||(top.s.total>=15);
+  if(hasMax||stagesLeft===0){
+    const stg=stagesLeft===0?"river":stagesLeft===2?"flop":"turn";
+    return{action:stagesLeft===0?"submit":"lock",word:top.w,score:top.s,lockStage:stg};
+  }
+  // Otherwise always presses for more
+  return{action:"press",word:top.w,score:top.s,lockStage:null};
+}
+
+function aiMove(priv,comm,stagesLeft){
+  // Default tier is Strategic (single-player mode)
+  return aiMoveStrategic(priv,comm,stagesLeft);
 }
 
 // ─────────────────────────────────────────────
@@ -2609,16 +2736,18 @@ function autoLock(){
       return;
     }
   }
-  // No valid word typed — but if player already locked one, use that
-  if(G.lockedWord){
-    G.playerWord=G.lockedWord;
-    G.playerScore=G.lockedScore;
+  // Nothing in input — fall back to saved word from a previous press
+  if(G.savedWord){
+    const s=scoreWord(G.savedWord,G.priv);
+    G.playerWord=G.savedWord;G.playerScore=s;
+    G.playerLockStage="river";
     runAIAndResolve();
     return;
   }
   // Truly nothing — zero points
   G.playerWord=null;
   G.playerScore={total:0,breakdown:"time expired — no valid word"};
+  G.playerLockStage="river";
   runAIAndResolve();
 }
 
@@ -2655,6 +2784,10 @@ function renderStage(){
   // pip0 = between flop and turn, pip1 = between turn and river
   document.getElementById("pip0").className="stage-pip"+(idx>0?" done":idx===0?" active":"");
   document.getElementById("pip1").className="stage-pip"+(idx>1?" done":idx===1?" active":"");
+  // Lock bonus hint on button
+  const bonus=LOCK_BONUS[G.stage]||0;
+  const hint=document.getElementById("lockBonusHint");
+  if(hint)hint.textContent=bonus>0?`+${bonus}`:"";
 }
 function setAI(state){
   const dot=document.getElementById("aiDot"),txt=document.getElementById("aiStatusText");
@@ -2669,12 +2802,24 @@ function setAI(state){
 function showHowToPlay(){goSlide(1);document.getElementById("howToPlayModal").classList.add("show");}
 function closeModal(){document.getElementById("howToPlayModal").classList.remove("show");}
 function goSlide(n){[1,2,3].forEach(i=>document.getElementById("slide"+i).className="modal-page"+(i===n?" active":""));}
+function dismissWhatsNew(){
+  document.getElementById("whatsNewBanner").style.display="none";
+  try{localStorage.setItem("pressWhatsNewSeen","v2.1");}catch(e){}
+}
+function initWhatsNew(){
+  try{
+    if(localStorage.getItem("pressWhatsNewSeen")==="v2.1")
+      document.getElementById("whatsNewBanner").style.display="none";
+  }catch(e){}
+}
 function dealAndStart(){
   closeModal();
   document.getElementById("homeScreen").style.display="none";
   document.getElementById("scoreHeader").style.display="block";
   startRound();
 }
+// Init on load
+initWhatsNew();
 function goHome(){
   stopTimer();
   document.getElementById("resultScreen").classList.remove("show");
@@ -2698,17 +2843,19 @@ function startRound(){
   const{priv,comm}=dealTiles();
   G={priv,comm,stage:"flop",revealedCount:3,pressCount:0,
      lockedWord:null,lockedScore:null,playerWord:null,playerScore:null,
-     aiWord:null,aiScore:null,justRevealed:false};
+     aiWord:null,aiScore:null,justRevealed:false,
+     playerLockStage:null,aiLockStage:null,savedWord:null};
 
   document.getElementById("wordInput").value="";
   document.getElementById("inputHint").textContent="";
   document.getElementById("lockedBadge").style.display="none";
   document.getElementById("penaltyNotice").classList.remove("show");
+  document.getElementById("wordSaved").textContent="";
+  document.getElementById("wordSaved").classList.remove("show");
   document.getElementById("lockPressRow").style.display="grid";
   document.getElementById("submitRow").style.display="none";
   document.getElementById("btnPress").disabled=false;
   document.getElementById("btnLock").disabled=false;
-  document.getElementById("lockedHint").style.display="none";
   setAI("ready");renderTiles();renderStage();
   startTimer(TIMER_LIMITS.flop);
   document.getElementById("wordInput").focus();
@@ -2719,35 +2866,35 @@ function handleLock(auto=false){
   if(!auto&&!validateInput(word))return;
   stopTimer();
   const s=scoreWord(word,G.priv);
+  const bonus=LOCK_BONUS[G.stage]||0;
+  if(bonus>0){s.total+=bonus;s.breakdown+=` +${bonus} early lock`;}
   G.lockedWord=word;G.lockedScore=s;G.playerWord=word;G.playerScore=s;
-  document.getElementById("lockedBadge").style.display="flex";
-  document.getElementById("lockedWordDisplay").textContent=word.toUpperCase();
-  document.getElementById("lockedScoreDisplay").textContent=s.total+"pts";
-  document.getElementById("wordInput").value="";
-  document.getElementById("inputHint").textContent="";
-
-  // At river — round is done, resolve now
-  // Otherwise — stay in game, player can still press for more letters
-  // Timer stops on lock — only restarts if player chooses to Press
-  if(G.stage==="river"){
-    runAIAndResolve();
-  } else {
-    document.getElementById("btnLock").disabled=true;
-    document.getElementById("lockedHint").style.display="block";
-    stopTimer();
-  }
+  G.playerLockStage=G.stage;
+  // Lock ends the round immediately — no limbo, no press option
+  runAIAndResolve();
 }
 
 function handlePress(){
   stopTimer();G.pressCount++;
+  // Show word-saved notice if player has a valid word typed
+  const typedWord=document.getElementById("wordInput").value.trim().toLowerCase();
+  const savedEl=document.getElementById("wordSaved");
+  if(typedWord.length>=5&&DICT.has(typedWord)){
+    const avail=[...G.priv,...G.comm.slice(0,G.revealedCount)];
+    if(canForm(typedWord,avail)){
+      G.savedWord=typedWord; // remember it
+      savedEl.textContent=`✓ ${typedWord.toUpperCase()} saved — hunting for better`;
+      savedEl.classList.add("show");
+    }
+  } else {
+    savedEl.textContent="";savedEl.classList.remove("show");
+  }
   if(G.stage==="flop"){G.stage="turn";G.revealedCount=4;}
   else if(G.stage==="turn"){G.stage="river";G.revealedCount=5;}
   G.justRevealed=true;renderTiles();renderStage();
-  if(G.lockedWord)document.getElementById("penaltyNotice").classList.add("show");
   if(G.stage==="river"){
     document.getElementById("lockPressRow").style.display="none";
     document.getElementById("submitRow").style.display="block";
-    document.getElementById("btnPress").disabled=true;
   }
   startTimer(TIMER_LIMITS[G.stage]);
 }
@@ -2755,15 +2902,25 @@ function handlePress(){
 function handleSubmit(auto=false){
   const word=document.getElementById("wordInput").value.trim().toLowerCase();
   if(!auto&&!validateInput(word))return;
-  stopTimer(); // timer stops on submit
+  stopTimer();
   if(!word||word.length<5){
+    // Fall back to saved word from a press if available
+    if(G.savedWord){
+      const s=scoreWord(G.savedWord,G.priv);
+      G.playerWord=G.savedWord;G.playerScore=s;
+      G.playerLockStage="river";
+      runAIAndResolve();return;
+    }
     G.playerWord=null;G.playerScore={total:0,breakdown:"no word submitted"};
+    G.playerLockStage="river";
     runAIAndResolve();return;
   }
   let s=scoreWord(word,G.priv);
-  if(G.pressCount>0&&G.lockedWord&&word.length<=G.lockedWord.length)
-    s={...s,total:Math.max(0,G.lockedScore.total-PRESS_PENALTY),breakdown:s.breakdown+" (−3 press penalty)"};
+  // Penalty: only if player pressed and final word is no longer than saved/first word
+  if(G.pressCount>0&&G.savedWord&&word.length<=G.savedWord.length)
+    s={...s,total:Math.max(0,scoreWord(G.savedWord,G.priv).total-PRESS_PENALTY),breakdown:s.breakdown+" (−3 press penalty)"};
   G.playerWord=word;G.playerScore=s;
+  if(!G.playerLockStage)G.playerLockStage="river";
   runAIAndResolve();
 }
 
@@ -2779,7 +2936,8 @@ function validateInput(word){
 
 function runAIAndResolve(){
   setAI("thinking");
-  let aiStage=G.stage,aiRev=G.revealedCount,aiPC=0,aiPrevWord=null;
+  let aiStage="flop",aiRev=3,aiPC=0,aiPrevWord=null,aiLockStage=null;
+  // AI always starts from flop and plays forward independently
   function step(){
     const comm=G.comm.slice(0,aiRev);
     const stLeft=aiStage==="river"?0:aiStage==="turn"?1:2;
@@ -2793,11 +2951,18 @@ function runAIAndResolve(){
       let aiWord=move.word;
       let aiScore=move.score||(aiWord?scoreWord(aiWord,G.priv):{total:0,breakdown:"no word"});
       if(!aiWord)aiScore={total:0,breakdown:"no word found"};
+      // Apply press penalty if AI pressed and didn't improve
       if(aiPC>0&&aiWord&&aiPrevWord&&aiWord.length<=aiPrevWord.length){
         const ps=scoreWord(aiPrevWord,G.priv);
-        aiScore={...aiScore,total:Math.max(0,ps.total-PRESS_PENALTY)};
+        aiScore={...aiScore,total:Math.max(0,ps.total-PRESS_PENALTY),breakdown:aiScore.breakdown+" (−3 press penalty)"};
       }
-      G.aiWord=aiWord;G.aiScore=aiScore;
+      // Apply lock bonus for AI
+      aiLockStage=move.lockStage||aiStage;
+      const aiBonus=LOCK_BONUS[aiLockStage]||0;
+      if(aiBonus>0&&aiPC===0){ // only if they didn't press after locking
+        aiScore={...aiScore,total:aiScore.total+aiBonus,breakdown:aiScore.breakdown+` +${aiBonus} early lock`};
+      }
+      G.aiWord=aiWord;G.aiScore=aiScore;G.aiLockStage=aiLockStage;
       setTimeout(()=>{setAI("done");setTimeout(resolveRound,600);},400);
     }
   }
@@ -2805,7 +2970,8 @@ function runAIAndResolve(){
 }
 
 function resolveRound(){
-  const allTiles=[...G.priv,...G.comm.slice(0,G.revealedCount)];
+  // Best word uses ALL 5 community + 3 private (full information reveal)
+  const allTiles=[...G.priv,...G.comm];
   const best=findBestWord(allTiles,G.priv);
   const bestScore=best?scoreWord(best,G.priv):null;
   const ps=G.playerScore?.total||0,as=G.aiScore?.total||0;
@@ -2819,6 +2985,28 @@ function resolveRound(){
   else if(as>ps){v.textContent="Strategic wins this round";v.className="round-verdict lose";}
   else{v.textContent="It's a tie";v.className="round-verdict tie";}
 
+  // ── Render all 5 community tiles ──
+  const commRow=document.getElementById("resultCommunityTiles");
+  commRow.innerHTML="";
+  const divider=document.createElement("div");divider.className="result-tiles-divider";commRow.appendChild(divider);
+  G.comm.forEach((l,i)=>{
+    const d=document.createElement("div");
+    d.className="result-tile"+(RARE.has(l)?" rare":"");
+    d.textContent=l;
+    commRow.appendChild(d);
+  });
+
+  // ── Stage badges ──
+  const stageLabel=s=>s==="flop"?"locked at Flop":s==="turn"?"locked at Turn":"submitted at River";
+  const stageCls=s=>s==="flop"?"flop":s==="turn"?"turn":"river";
+  const pb=document.getElementById("playerStageBadge");
+  pb.textContent=stageLabel(G.playerLockStage||"river");
+  pb.className="result-stage-badge "+stageCls(G.playerLockStage||"river");
+  const ab=document.getElementById("aiStageBadge");
+  ab.textContent=stageLabel(G.aiLockStage||"river");
+  ab.className="result-stage-badge "+stageCls(G.aiLockStage||"river");
+
+  // ── Player & AI result cards ──
   document.getElementById("playerResultWord").textContent=G.playerWord?G.playerWord.toUpperCase():"—";
   document.getElementById("playerResultScore").textContent=ps+"pts";
   document.getElementById("playerResultBreakdown").textContent=G.playerScore?.breakdown||"";
@@ -2829,6 +3017,7 @@ function resolveRound(){
   if(ps>=as){document.getElementById("playerCard").classList.add("winner");document.getElementById("aiCard").classList.add("loser");}
   else{document.getElementById("aiCard").classList.add("winner");document.getElementById("playerCard").classList.add("loser");}
 
+  // ── Best possible word (from all 8 tiles) ──
   const rw=document.getElementById("raisinWord"),rs=document.getElementById("raisinScore");
   if(best){
     const pf=G.playerWord?.toLowerCase()===best.toLowerCase();
@@ -2851,17 +3040,9 @@ document.getElementById("wordInput").addEventListener("input",function(){
     else{
       const avail=[...G.priv,...G.comm.slice(0,G.revealedCount)];
       if(!canForm(word,avail)){hint.textContent="Can't form from available tiles";this.classList.remove("valid");}
-      else{
-        hint.textContent="";this.classList.add("valid");
-        // Re-enable Lock if player has a locked word already — they can upgrade it
-        if(G.lockedWord) document.getElementById("btnLock").disabled=false;
-      }
+      else{hint.textContent="";this.classList.add("valid");}
     }
-  } else{
-    hint.textContent="";this.classList.remove("valid");
-    // Disable Lock again if input is cleared after having locked
-    if(G.lockedWord) document.getElementById("btnLock").disabled=true;
-  }
+  } else{hint.textContent="";this.classList.remove("valid");}
 });
 document.getElementById("wordInput").addEventListener("keydown",function(e){
   if(e.key==="Enter"&&G.priv){

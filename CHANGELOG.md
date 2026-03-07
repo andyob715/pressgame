@@ -4,6 +4,40 @@ All notable changes to pressgame.live are documented here.
 
 ---
 
+## v2.1 — 2026-03-06
+
+### Changed
+- **Lock now ends your round immediately** — no more limbo state after locking. Once you lock, the round resolves and the AI plays out. Lock + Press is no longer a valid path.
+- **Penalty simplified** — the −3 press penalty now only applies when you Press and your final word is no longer than the word you had saved before pressing. Never applies to Lock.
+- **"Word saved" reassurance** — when you Press with a valid word typed, a subtle confirmation appears: e.g. "✓ CODER saved — hunting for better." Your safety net is now visible.
+
+### Added
+- **What's New banner** on home screen — lightweight, dismissable, shows returning testers what changed. Remembers dismissal via localStorage.
+
+### Updated
+- How to Play slide 2 updated to reflect new Lock behavior and Press safety net mechanic
+
+---
+
+## v2.0 — 2026-03-06
+
+### Added
+- **Early lock bonus** — Lock at Flop earns +2pts; Lock at Turn earns +1pt; River submit earns no bonus. The Lock button now displays the active bonus (+2 / +1) so players can see exactly what they're giving up before pressing. Designed to make locking a genuinely tempting choice rather than a trap.
+- **Three AI tiers with distinct philosophies:**
+  - **Casual** — locks early and chases the bonus aggressively. Locks at Flop whenever any valid word is available. Never presses unless there's no word yet.
+  - **Strategic** (default) — calculates expected value. Weighs the lock bonus against potential word improvement. The baseline opponent.
+  - **Mastermind** — ignores the bonus entirely. Only locks/submits when holding a 7-letter word or maximum-scoring word. Always presses for more if a better word is theoretically reachable.
+- **Result screen upgrade — full transparency:**
+  - All 5 community tiles are now shown on the result screen regardless of when the player locked
+  - Stage indicator badge on each result card: e.g. "locked at Flop", "locked at Turn", "submitted at River"
+  - AI badge shows which stage Strategic locked or submitted at
+- **Best possible word** now calculated from all 8 tiles (3 private + all 5 community), not just tiles visible at submission
+
+### Changed
+- How to Play modal updated: Lock/Press slide now mentions early lock bonuses; Scoring slide lists +2 Flop / +1 Turn bonus rows; max possible score updated to 23pts
+
+---
+
 ## v1.6 — 2026-03-05
 
 ### Fixed
