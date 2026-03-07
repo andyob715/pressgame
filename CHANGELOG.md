@@ -4,6 +4,14 @@ All notable changes to pressgame.live are documented here.
 
 ---
 
+## v2.2 — 2026-03-07
+
+### Changed
+- **Timer rebalanced** — Flop 45s / Turn 50s / River 60s. Cognitive load grows with each stage: Flop is fast pattern matching, River is full re-evaluation with maximum combinations. Timer now reflects that.
+- **No auto-focus on mobile** — input no longer steals focus on round start for mobile devices. Keyboard stays closed until player taps, keeping tiles visible above the fold. Desktop behavior unchanged.
+
+---
+
 ## v2.1 — 2026-03-06
 
 ### Changed

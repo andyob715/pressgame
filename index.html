@@ -2565,7 +2565,7 @@ const DECK   = [
   ...Array(2).fill("L"),...Array(2).fill("U"),...Array(2).fill("H"),
   ...Array(2).fill("C"),"B","F","G","M","P","W","Y","J","K","X","Z","QU"
 ];
-const TIMER_LIMITS  = {flop:60,turn:45,river:30};
+const TIMER_LIMITS  = {flop:45,turn:50,river:60};
 const PRESS_PENALTY = 3;
 const BASE_SCORES   = {4:5,5:5,6:9,7:15};
 const STAGES        = ["flop","turn","river"];
@@ -2861,7 +2861,9 @@ function startRound(){
   document.getElementById("btnLock").disabled=false;
   setAI("ready");renderTiles();renderStage();
   startTimer(TIMER_LIMITS.flop);
-  document.getElementById("wordInput").focus();
+  // Don't auto-focus on mobile — keyboard opening immediately pushes tiles off screen
+  if(!/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent))
+    document.getElementById("wordInput").focus();
 }
 
 function handleLock(auto=false){
